@@ -1,16 +1,21 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.card {
+    @apply m-2 bg-white shadow-lg rounded-md bg-opacity-80;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.button {
+    @apply m-2 p-2 bg-blue-300 hover:bg-blue-400  border border-black
+        rounded-full shadow-lg transition ease-in-out hover:scale-105;
 }
 
-* {
-  box-sizing: border-box;
+.input {
+    @apply m-2 p-2 font-light rounded-md border border-black focus:outline-none
+        focus:placeholder-gray-300 placeholder-gray-500;
+}
+
+.m-responsive {
+    @apply m-2 ml-5 mr-5 sm:mr-8 sm:ml-8;
 }
