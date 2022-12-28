@@ -3,6 +3,7 @@ import React, { useRef } from "react";
 import { useEffect, useState } from "react";
 import { useAccount, useNetwork } from "wagmi";
 import { signTypedData } from "@wagmi/core";
+import { BigNumber } from "ethers";
 
 const Home: NextPage = () => {
   const { address, isConnected } = useAccount();
@@ -12,9 +13,8 @@ const Home: NextPage = () => {
     setConnected(isConnected);
   }, [isConnected]);
 
-  let nameRef = useRef<HTMLInputElement>(null);
-  let imageUrlRef = useRef<HTMLInputElement>(null);
-  let descRef = useRef<HTMLInputElement>(null);
+  let startTimeRef = useRef<HTMLInputElement>(null);
+  let endTimeRef = useRef<HTMLInputElement>(null);
 
   if (connected) {
     return (
@@ -25,23 +25,16 @@ const Home: NextPage = () => {
 
         <div className="card flex flex-col p-2 items-center">
           <input
-            ref={nameRef}
+            ref={startTimeRef}
             type="text"
-            placeholder="Name"
+            placeholder="startTime"
             className="input w-full sm:w-3/4 md:w-2/3 lg:w-1/2"
           ></input>
 
           <input
-            ref={descRef}
+            ref={endTimeRef}
             type="text"
-            placeholder="Description"
-            className="input w-full sm:w-3/4 md:w-2/3 lg:w-1/2"
-          ></input>
-
-          <input
-            ref={imageUrlRef}
-            type="text"
-            placeholder="Image Url"
+            placeholder="endTime"
             className="input w-full sm:w-3/4 md:w-2/3 lg:w-1/2"
           ></input>
 
@@ -49,14 +42,13 @@ const Home: NextPage = () => {
             <button
               className="button font-medium"
               onClick={async () => {
-                await lazyMint(
-                  nameRef.current?.value as string,
-                  descRef.current?.value as string,
-                  imageUrlRef.current?.value as string
+                await sign(
+                  startTimeRef?.current?.value as unknown as number,
+                  endTimeRef?.current?.value as unknown as number
                 );
               }}
             >
-              <a> Lazy Mint </a>
+              <a> Create Signature!! </a>
             </button>
           </div>
         </div>
@@ -72,37 +64,30 @@ const Home: NextPage = () => {
     </>
   );
 
-  async function lazyMint(name: string, desc: string, image: string) {
-    console.log({
-      name,
-      desc,
-      image,
-    });
+  async function sign(startTime: number, endTime: number) {
     const domain = {
-      name: "Lazy Mint Signature",
+      name: "SignatureHandler",
       version: "1",
       chainId: chain?.id,
-      verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC",
+      verifyingContract: "0xd59d25a9cafF8649F837C03C4fa299f21fF38E3B",
     } as const;
 
-    // The named list of all type definitions
     const types = {
-      LazyMint: [
-        { name: "name", type: "string" },
-        { name: "description", type: "string" },
-        { name: "image", type: "string" },
+      Request: [
+        { name: "validityStartTimestamp", type: "uint256" },
+        { name: "validityEndTimestamp", type: "uint256" },
       ],
     } as const;
 
     const value = {
-      name,
-      description: desc,
-      image,
+      validityStartTimestamp: BigNumber.from(startTime),
+      validityEndTimestamp: BigNumber.from(endTime),
     } as const;
 
     console.log(domain, types, value);
     const signature = await signTypedData({ domain, types, value });
-    alert(`Lazy minted signature: ${signature}`);
+    console.log({ signature });
+    alert(`Created signature: ${signature}`);
   }
 };
 
